@@ -16,16 +16,16 @@
   const int buzzerB_tone = 2000;    //Frequency buzzer B tones
 
    //Assorted variables used
-   int checkout_time = 3600000;  //how long the marker can be removed before the buzzer goes off (1hr)
-   int countdown_time[4] = {0, 0, 0, 0};       //how much time has elapsed since each marker was pulled
-   time_t   
+   int        checkout_time = 3600000;  //how long the marker can be removed before the buzzer goes off (1hr)
+   time_t     countdown_time[4] = {0, 0, 0, 0};       //how much time has elapsed since each marker was pulled
+     
 
 void setup() {
   // put your setup code here, to run once:
-  
+  time_t     current_time = now();        //get the current time (seconds, since Jan 1 1970)
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-
+ 
 }
