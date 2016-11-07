@@ -43,7 +43,11 @@ void loop() {
         tone(buzzerA, buzzerA_tone);
         i = 0;
       }
-      else(){
+      else{
+        i=0;
+      }
+      
+      if(i>=2){
         tone(buzzerB, buzzerB_tone);
         i = 0;
       }
