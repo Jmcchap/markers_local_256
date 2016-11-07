@@ -21,7 +21,7 @@
 
    //Assorted variables used
    int      alloted_time = 3600000;                       //how long the marker can be removed before the buzzer goes off (1hr)
-   int      checkout_time[4] = {0, 0, 0, 0};             //how much time the user is allowed to borrow the marker
+   int      checkout_time[4] = {0, 0, 0, 0};             //how much time the user is has been borrowing the marker
    int      light_threashold[4] = {511, 511, 511, 511};   //to fine tune later. The value the sensors return that mean a maker is removed. 
    time_t   current_time = 0; 
 
@@ -31,8 +31,7 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  current_time = now();
+   current_time = now();
    read(sensor_values, QTR_EMITTERS_ON);
 
    for (i=0; i<4; i++){
@@ -41,10 +40,11 @@ void loop() {
     }
     if(checkout_time[i] > current_time){
       if(i<2){
-        TONE A;
+        tone(buzzerA, buzzerA_tone);
+        i = 0;
       }
       else(){
-        TONE B;
+        tone(buzzerB, buzzerB_tone);
         i = 0;
       }
      }else{
