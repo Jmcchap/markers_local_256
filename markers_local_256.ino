@@ -1,3 +1,5 @@
+
+
 //IR version of markers local
 
 #include <QTRSensors.h>
@@ -6,9 +8,9 @@
 
     // Inputs 
     
-  QTRSensorsAnalog qtra((unsigned char[] {5, 6, 7, 8}, 4)  //pin locations of the IR sensors
+  QTRSensorsAnalog qtra((unsigned char[]) {5, 6, 7, 8},4);  //pin locations of the IR sensors
   
-  int sensor_values[4] = {0, 0, 0, 0};
+  unsigned int sensor_value[4] = {0, 0, 0, 0};
   
 
   
@@ -24,6 +26,7 @@
    int      checkout_time[4] = {0, 0, 0, 0};             //how much time the user is has been borrowing the marker
    int      light_threashold[4] = {511, 511, 511, 511};   //to fine tune later. The value the sensors return that mean a maker is removed. 
    time_t   current_time = 0; 
+   int      i=0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -32,10 +35,10 @@ void setup() {
 
 void loop() {
    current_time = now();
-   read(sensor_values, QTR_EMITTERS_ON);
+   qtra.read(sensor_value, QTR_EMITTERS_ON);
 
    for (i=0; i<4; i++){
-    if(light_threashold[i] < snesor_value[i]){
+    if(light_threashold[i] < sensor_value[i]){
       checkout_time[i] = current_time + alloted_time;
     }
     if(checkout_time[i] > current_time){
