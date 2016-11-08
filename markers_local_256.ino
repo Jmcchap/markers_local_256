@@ -20,6 +20,8 @@
   const int buzzerB = 9;            //D6, Fab-side buzzer
   const int buzzerA_tone = 1000;    //Frequency buzzer A tones
   const int buzzerB_tone = 2000;    //Frequency buzzer B tones
+   unsigned long buzzerB_duration = 1000;  //Buzzer B length of one tone
+   unsigned long buzzerA_duration = 1000;  //Buzzer A length of one tone
 
    //Assorted variables used
    int      alloted_time = 3600000;                       //how long the marker can be removed before the buzzer goes off (1hr)
@@ -43,7 +45,8 @@ void loop() {
     }
     if(checkout_time[i] > current_time){
       if(i<2){
-        tone(buzzerA, buzzerA_tone);
+        noTone(buzzerB);
+        tone(buzzerA, buzzerA_tone,buzzerA_duration);
         i = 0;
       }
       else{
@@ -51,7 +54,8 @@ void loop() {
       }
       
       if(i>=2){
-        tone(buzzerB, buzzerB_tone);
+        noTone(buzzerA);
+        tone(buzzerB, buzzerB_tone, buzzerB_duration);
         i = 0;
       }
      }else{
