@@ -1,65 +1,101 @@
-
-
-//IR version of markers local
-
+#include <ESP8266WiFi.h>
+//#include <WifiManager.h>
 #include <QTRSensors.h>
 #include <Time.h>
 #include <TimeLib.h>
 
-    // Inputs 
-    
-  QTRSensorsAnalog qtra((unsigned char[]) {5, 6, 7, 8},4);  //pin locations of the IR sensors
-  
-  unsigned int sensor_value[4] = {0, 0, 0, 0};
-  
+/* INPUTS */
+int pins[] = {D5, D6, D7, D8};              //Digital pins
 
-  
-  
-    //Outputs. Buzzers that buzz when the markers have been 'checked out' too long. 
-  const int buzzerA = 8;            //D5, Door-side buzzer
-  const int buzzerB = 9;            //D6, Fab-side buzzer
-  const int buzzerA_tone = 1000;    //Frequency buzzer A tones
-  const int buzzerB_tone = 2000;    //Frequency buzzer B tones
-  unsigned long buzzerB_duration = 1000;  //Buzzer B length of one tone
-  unsigned long buzzerA_duration = 1000;  //Buzzer A length of one tone
+/* OUTPUTS */
 
-   //Assorted variables used
-   int      alloted_time = 300000;                       //how long the marker can be removed before the buzzer goes off (5 minutes)
-   int      checkout_time[4] = {0, 0, 0, 0};             //how much time the user is has been borrowing the marker
-   int      light_threashold[4] = {511, 511, 511, 511};   //to fine tune later. The value the sensors return that mean a maker is removed. 
-   time_t   current_time = 0; 
-   int      i=0;
+/*CONSTANTS*/
+int allotedTime = 5000;                          //How much time the user is allowed to check out the pen (5 seconds)
+int lightThreashold[] = {511, 511, 511, 511};   //The value in which the pen is considered removed. NEEDS TRIAL
+
+
+/*OTHER VARIABLES*/
+int checkoutTime[] = {0, 0, 0, 0};              //The time in which each pen was removed
+int sensorValue[] = {0, 0, 0, 0};               //The analog values returned by sensor
+time_t currentTime = 0;                            //The time retrieved from now()
+int sensorQTY = 4;                              //The number of sensors - 1
+int sensorIndex = 0;                            //what sensor is currently being worked on
+bool overdue[] = {false, false, false, false};  //Pretty much determines if the conditions are right for the buzzer to buzz
+
+
+//connect to WiFi network
+void setup_wifi(){
+
+  Serial.println("Starting wireless.");
+  WiFiManager wifiManager; //Load the Wi-Fi Manager library.
+  wifiManager.setTimeout(300); //Give up with the AP if no users gives us configuration in this many secs.
+  if(!wifiManager.autoConnect()) {
+    Serial.println("failed to connect and hit timeout");
+    delay(3000);
+    ESP.restart();
+  }
+  
+  Serial.println("");
+  Serial.print("Successfully connected to ");
+  Serial.println(WiFi.localIP());
+}
 
 void setup() {
-  // put your setup code here, to run once:
+  setup_wifi();
+ 
+  for(i=0; i < sensorQTY; i++){
+    pinMode(i, OUTPUT);
+    digitalWrite(i, LOW);
+  }
+}
+
+/*read the sensor that is highlighted (sensorIndex) by setting the Digital output to high for the sensor
+and reading it from the Analog sensor A0.*/
+readSensors(sensorIndex){
+  digitalWrite(sensorIndex, HIGH);
+  delay(250);
+  sensorValue[sensorIndex] = analogRead(A0);
+  digitalWrite(sensorIndex, LOW);
+}
+
+checkTimer(sensorIndex){
+  currentTime = now();
+  if(checkoutTime[sensorIndex] > currentTime){
+    overdue[sensorIndex] = TRUE;
+  }
+}
+
+assignTimer(sensorIndex){
+  checkoutTime[sensorIndex] = now() + allotedTime;
+}
+
+
+/*Compare the values of the sensor that is read against the light threashold that is set. If it is determined
+that the marker is removed, then a timer would be assigned*/
+compareSensor(sensorIndex){
+  if(sensorValue[sensorIndex] >= lightThreashold[sensorIndex]){
+    if(sensorValue[sensorIndex] == 0);{
+      assignTimer(sensorIndex);
+    }
+    else{
+      checkTimer(sensorIndex);
+    }
+  }
+}
+
+buzzer(sensorIndex){
   
 }
 
-void loop() {
-   current_time = now();
-   qtra.read(sensor_value, QTR_EMITTERS_ON);
 
-   for (i=0; i<4; i++){
-    if(light_threashold[i] < sensor_value[i]){
-      checkout_time[i] = current_time + alloted_time;
+void loop() {
+  for(sensorIndex = 0; sensorIndex < sensorQTY; sensorIndex++){
+    readSensors(sensorIndex);
+    compareSensors(sensorIndex);
+    
+    if (overdue[sensorIndex] = true){
+      buzzer(sensorIndex);
+      }
     }
-    if(checkout_time[i] > current_time){
-      if(i<2){
-        noTone(buzzerB);
-        tone(buzzerA, buzzerA_tone,buzzerA_duration);
-        i = 0;
-      }
-      else{
-        i=0;
-      }
-      
-      if(i>=2){
-        noTone(buzzerA);
-        tone(buzzerB, buzzerB_tone, buzzerB_duration);
-        i = 0;
-      }
-     }else{
-      i = 0;
-     }
-   }
+
 }
