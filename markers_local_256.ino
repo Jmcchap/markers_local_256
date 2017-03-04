@@ -1,3 +1,5 @@
+#include <dummy.h>
+
 #include <ESP8266WiFi.h>
 //#include <WifiManager.h>
 #include <QTRSensors.h>
@@ -11,7 +13,7 @@ int pins[] = {D5, D6, D7, D8};              //Digital pins
 
 /*CONSTANTS*/
 int allotedTime = 5000;                          //How much time the user is allowed to check out the pen (5 seconds)
-int lightThreashold[] = {511, 511, 511, 511};   //The value in which the pen is considered removed. NEEDS TRIAL
+int lightThreshold[] = {511, 511, 511, 511};   //The value in which the pen is considered removed. NEEDS TRIAL
 
 
 /*OTHER VARIABLES*/
@@ -73,8 +75,8 @@ assignTimer(sensorIndex){
 /*Compare the values of the sensor that is read against the light threashold that is set. If it is determined
 that the marker is removed, then a timer would be assigned*/
 compareSensor(sensorIndex){
-  if(sensorValue[sensorIndex] >= lightThreashold[sensorIndex]){
-    if(sensorValue[sensorIndex] == 0);{
+  if(sensorValue[sensorIndex] >= lightThreshold[sensorIndex]){
+    if(checkoutTime[sensorIndex] == 0);{
       assignTimer(sensorIndex);
     }
     else{
