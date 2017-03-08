@@ -42,14 +42,14 @@ bool overdue[] = {false, false, false, false};  //Pretty much determines if the 
 //  Serial.println(WiFi.localIP());
 //}
 
-//void setup() {
-//  setup_wifi();
-//
-//  for (i = 0; i < sensorQTY; i++) {
-//    pinMode(i, OUTPUT);
-//    digitalWrite(i, LOW);
-//  }
-//}
+void setup() {
+  //setup_wifi();
+
+  for (int i = 0; i < sensorQTY; i++) {
+    pinMode(i, OUTPUT);
+   digitalWrite(i, LOW);
+ }
+}
 
 /*read the sensor that is highlighted (sensorIndex) by setting the Digital output to high for the sensor
   and reading it from the Analog sensor A0.*/
@@ -65,6 +65,7 @@ currentTime = now();
   if (checkoutTime[sensorIndex] > currentTime) {
     overdue[sensorIndex] = true;
   }
+}
 
 
 /*Record the time that the marker should be returned*/
@@ -77,7 +78,7 @@ void assignTimer(int sensorIndex) {
   that the marker is removed, then a timer would be assigned*/
 void compareSensor(int sensorIndex) {
   if (sensorValue[sensorIndex] >= lightThreshold[sensorIndex]) {
-    if (checkoutTime[sensorIndex] == 0); {
+    if (checkoutTime[sensorIndex] == 0) {
       assignTimer(sensorIndex);
     }
     else {
@@ -94,10 +95,10 @@ void compareSensor(int sensorIndex) {
 void loop() {
   for (sensorIndex = 0; sensorIndex < sensorQTY; sensorIndex++) {
     readSensors(sensorIndex);
-    compareSensors(sensorIndex);
+    compareSensor(sensorIndex);
 
     if (overdue[sensorIndex] = true) {
-      buzzer(sensorIndex);
+     // buzzer(sensorIndex);
     }
   }
 
