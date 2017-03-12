@@ -1,7 +1,6 @@
-
-
+#include <WiFiManager.h>
 #include <ESP8266WiFi.h>
-//#include <WifiManager.h>
+
 #include <QTRSensors.h>
 #include <Time.h>
 #include <TimeLib.h>
@@ -19,28 +18,28 @@ int lightThreshold[] = {511, 511, 511, 511};   //The value in which the pen is c
 /*OTHER VARIABLES*/
 int checkoutTime[] = {0, 0, 0, 0};              //The time in which each pen was removed
 int sensorValue[] = {0, 0, 0, 0};               //The analog values returned by sensor
-time_t currentTime = 0;                            //The time retrieved from now()
+time_t currentTime = 0;                         //The time retrieved from now()
 int sensorQTY = 4;                              //The number of sensors - 1
 int sensorIndex = 0;                            //what sensor is currently being worked on
 bool overdue[] = {false, false, false, false};  //Pretty much determines if the conditions are right for the buzzer to buzz
 
 
 //connect to WiFi network
-//void setup_wifi() {
-//
-//  Serial.println("Starting wireless.");
-//  WiFiManager wifiManager; //Load the Wi-Fi Manager library.
-//  wifiManager.setTimeout(300); //Give up with the AP if no users gives us configuration in this many secs.
-//  if (!wifiManager.autoConnect()) {
-//    Serial.println("failed to connect and hit timeout");
-//    delay(3000);
-//    ESP.restart();
-//  }
-//
-//  Serial.println("");
-//  Serial.print("Successfully connected to ");
-//  Serial.println(WiFi.localIP());
-//}
+void setup_wifi() {
+
+  Serial.println("Starting wireless.");
+  WiFiManager wifiManager; //Load the Wi-Fi Manager library.
+  wifiManager.setTimeout(300); //Give up with the AP if no users gives us configuration in this many secs.
+  if (!wifiManager.autoConnect()) {
+    Serial.println("failed to connect and hit timeout");
+    delay(3000);
+    ESP.restart();
+  }
+
+  Serial.println("");
+  Serial.print("Successfully connected to ");
+  Serial.println(WiFi.localIP());
+}
 
 void setup() {
   //setup_wifi();
