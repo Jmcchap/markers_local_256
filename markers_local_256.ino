@@ -1,12 +1,13 @@
+//#include <QTRSensors.h>
+
 #include <WiFiManager.h>
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
-#include <QTRSensors.h>
 #include <Time.h>
 #include <TimeLib.h>
 
-/* INPUTS */
+/* PINS */
 int pins[] = {D5, D6, D7, D8};              //Digital pins
 
 /*MQTT STUFF*/
@@ -33,7 +34,6 @@ PubSubClient client(espClient);
 
 //connect to WiFi network
 void setup_wifi() {
-
   Serial.println("Starting wireless.");
   WiFiManager wifiManager; //Load the Wi-Fi Manager library.
   wifiManager.setTimeout(300); //Give up with the AP if no users gives us configuration in this many secs.
@@ -56,7 +56,7 @@ void reconnect(){
   Serial.print("One moment, please...");
   
   if(client.connect("q2w3e4r5")){
-    Serial.println("There we go!");                    //If there is a successful reconnection
+    Serial.println("There we go!");              //If there is a successful reconnection
     client.publish(outTopic, "Here I am!");      //Publish an announcement
     
     
@@ -73,11 +73,14 @@ void reconnect(){
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("Markers Local Begin!");
+  
   
   setup_wifi();
+  Serial.println("Markers Local Begin!");
   client.setServer(mqtt_host, 1883);
 
+  pinMode(A0, INPUT);
+  
   for (int i = 0; i < sensorQTY; i++) {
     pinMode(i, OUTPUT);
    digitalWrite(i, LOW);
@@ -90,6 +93,11 @@ void readSensors(int sensorIndex){
   digitalWrite(sensorIndex, HIGH);
   delay(250);
   sensorValue[sensorIndex] = analogRead(A0);
+  
+  Serial.print( "SensorValue = [");
+  Serial.print(sensorIndex);
+  Serial.print( "] = " );
+  Serial.println(sensorValue[sensorIndex]);
 }
 
 /*See if it is time for the marker to be returned*/
@@ -139,12 +147,15 @@ void loop() {
 if(!client.connected()){
   reconnect();
  }
- 
+
 client.loop();
+Serial.println("made it past client.loop()!");
   
 for (sensorIndex = 0; sensorIndex < sensorQTY; sensorIndex++) {
     readSensors(sensorIndex);
+    Serial.println("readSensors");
     compareSensor(sensorIndex);
+    Serial.println("compareSensors");
 
     if (overdue[sensorIndex] = true) {
      buzzer(sensorIndex);
