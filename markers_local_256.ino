@@ -1,5 +1,6 @@
 #include <WiFiManager.h>
 #include <ESP8266WiFi.h>
+#include <PubSubClient.h>
 
 #include <QTRSensors.h>
 #include <Time.h>
@@ -8,7 +9,9 @@
 /* INPUTS */
 int pins[] = {D5, D6, D7, D8};              //Digital pins
 
-/* OUTPUTS */
+/*MQTT STUFF*/
+const char* mqtt_host = "iot.256.makerslocal.org";
+const char* outTopic = "ml256/info/markerslocal";
 
 /*CONSTANTS*/
 int allotedTime = 5000;                        //How much time the user is allowed to check out the pen (5 seconds)
@@ -22,6 +25,10 @@ time_t currentTime = 0;                         //The time retrieved from now()
 int sensorQTY = 4;                              //The number of sensors - 1
 int sensorIndex = 0;                            //what sensor is currently being worked on
 bool overdue[] = {false, false, false, false};  //Pretty much determines if the conditions are right for the buzzer to buzz
+
+//That block I don't fully understand again
+WiFiClient espClient;
+PubSubClient client(espClient);
 
 
 //connect to WiFi network
@@ -41,8 +48,35 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
+//reconnect if wifi is lost
+void reconnect(){
+ Serial.println("Oh no! Lost connection!"); 
+ 
+ while(!client.connected()) {
+  Serial.print("One moment, please...");
+  
+  if(client.connect("q2w3e4r5")){
+    Serial.println("There we go!");                    //If there is a successful reconnection
+    client.publish(outTopic, "Here I am!");      //Publish an announcement
+    
+    
+    
+  }else {
+    Serial.print("Well, drat. The issue seems to be: ");
+    Serial.println(client.state());
+    Serial.println("Trying again in a jiffy");
+    //Wait a jiffy seconds and retry connecting
+    delay(3340);
+  }
+ }
+}
+
 void setup() {
-  //setup_wifi();
+  Serial.begin(9600);
+  Serial.println("Markers Local Begin!");
+  
+  setup_wifi();
+  client.setServer(mqtt_host, 1883);
 
   for (int i = 0; i < sensorQTY; i++) {
     pinMode(i, OUTPUT);
@@ -86,18 +120,34 @@ void compareSensor(int sensorIndex) {
   }
 }
 
-//buzzer(sensorIndex) {
-//
-//}
+void buzzer(int sensorIndex) {
+  switch(sensorIndex){
+    case 0: 
+    case 1: Serial.println("Please returnt he marker to the left side of Table 1");
+            client.publish(outTopic, "Please return the marker to the left side of Table 1");
+            break;
+    case 2: 
+    case 3: Serial.println("Please returnt he marker to the right side of Table 1");
+            client.publish(outTopic, "Please return the marker to the right side of Table 1");
+            break;
+  }
+}
 
 
 void loop() {
-  for (sensorIndex = 0; sensorIndex < sensorQTY; sensorIndex++) {
+
+if(!client.connected()){
+  reconnect();
+ }
+ 
+client.loop();
+  
+for (sensorIndex = 0; sensorIndex < sensorQTY; sensorIndex++) {
     readSensors(sensorIndex);
     compareSensor(sensorIndex);
 
     if (overdue[sensorIndex] = true) {
-     // buzzer(sensorIndex);
+     buzzer(sensorIndex);
     }
   }
 
