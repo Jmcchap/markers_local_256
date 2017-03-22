@@ -118,7 +118,7 @@ void assignTimer(int sensorIndex) {
 /*Compare the values of the sensor that is read against the light threashold that is set. If it is determined
   that the marker is removed, then a timer would be assigned*/
 void compareSensor(int sensorIndex) {
-  if (sensorValue[sensorIndex] >= lightThreshold[sensorIndex]) {
+  if (sensorValue[sensorIndex] <= lightThreshold[sensorIndex]) {
     if (checkoutTime[sensorIndex] == 0) {
       assignTimer(sensorIndex);
     }
