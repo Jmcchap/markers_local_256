@@ -33,6 +33,12 @@ Serial.begin(9600);
 Then, it stores that value into the proper slot in sensorValue[] and returns the digital pin to LOW. */
 void readSensor(){
   Serial.println("readSensor");
+  Serial.print( "SensorValue[sensorIndex] = ");
+  Serial.println(sensorValue[sensorIndex]);
+  Serial.print("SensorValue[0] = ");
+  Serial.println(sensorValue[0]);
+  Serial.println("~~~~~~~~~~~~~~~~~~~~");
+  Serial.println();
         digitalWrite(pin[sensorIndex], HIGH);
         delay(250);
         sensorValue[sensorIndex] = analogRead(A0);  
@@ -61,10 +67,12 @@ void compareSensor(){
   Serial.println(sensorValue[sensorIndex]);
   Serial.print("SensorValue[0] = ");
   Serial.println(sensorValue[0]);
-
+  Serial.println("---");
   Serial.print("sensorIndex = ");
   Serial.println(sensorIndex);
-  if(sensorValue[sensorIndex] < 1000){
+  Serial.println();
+  
+  if(sensorValue[sensorIndex] < 100){
       markerDocked[sensorIndex] = false;
   }else{
       markerDocked[sensorIndex] = true;
@@ -73,6 +81,7 @@ void compareSensor(){
 
 void loop() {
   for( sensorIndex=0; sensorIndex<4; sensorIndex++){
+    
     readSensor();
     compareSensor();    
       if(markerDocked[sensorIndex] = false){      //if the marker is removed
@@ -87,9 +96,7 @@ void loop() {
       }
 
      
-      
-  }
-  Serial.print( "SensorValue[0] = ");
+        Serial.print( "SensorValue[0] = ");
   Serial.println(sensorValue[0]);
 //  Serial.print( "SensorValue[1] = ");
 //  Serial.println(sensorValue[1]);
@@ -113,5 +120,7 @@ void loop() {
   Serial.println();
   Serial.println();
   Serial.println();
+  }
+
   delay(3000);
 }
